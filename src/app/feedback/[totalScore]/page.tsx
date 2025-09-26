@@ -10,6 +10,7 @@ import {
   TargetIcon,
   ZapIcon,
 } from "lucide-react";
+import Link from "next/link";
 
 const FeedbackPage = () => {
   const params = useParams<{ totalScore: string }>();
@@ -75,8 +76,9 @@ const FeedbackPage = () => {
   const result = getResult();
 
   return (
-    <PageContainer className="min-[1100px]:bg-[url('/fundo1.svg')] mx-auto md:mx-0 bg-cover bg-center md:justify-start">
-      <div className="max-w-4xl mx-auto md:mx-[4%] text-center">
+    <PageContainer className="relative overflow-hidden md:justify-start">
+      <div className="absolute inset-0 lg:bg-[url('/fundo1.svg')] bg-cover bg-center filter blur-md z-0" />
+      <div className="max-w-4xl mx-auto md:mx-[4%] text-center relative z-10">
         <div className="mb-8">
           <div className="flex justify-center mb-6">{result.icon}</div>
           <h1 className="text-4xl font-bold text-foreground mb-4">
@@ -102,7 +104,10 @@ const FeedbackPage = () => {
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
+        <div className="flex justify-center gap-4">
+          <Button variant="secondary" className="text-lg px-8 py-6" asChild>
+            <Link href="/">Voltar para o início</Link>
+          </Button>
           <Button size="lg" className="text-lg px-8 py-6">
             CTA?
           </Button>
