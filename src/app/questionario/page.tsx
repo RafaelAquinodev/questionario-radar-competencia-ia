@@ -15,11 +15,17 @@ import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface Question {
   id: number;
   title: string;
   question: string;
+}
+
+interface FormData {
+  empresa: string;
 }
 
 const questions: Question[] = [
@@ -74,6 +80,10 @@ const questions: Question[] = [
 ];
 
 const QuestionarioPage = () => {
+  const [formData, setFormData] = useState<FormData>({
+    empresa: "",
+  });
+
   const min = 0;
   const max = 10;
   const step = 1;
@@ -98,6 +108,12 @@ const QuestionarioPage = () => {
   const totalScore = answers.reduce((acc, curr) => acc + curr, 0);
 
   const handleSubmit = async () => {
+    if (!formData.empresa) {
+      router.push(`/questionario/#0`);
+      toast.error("Por favor, responda todas as perguntas.");
+      return;
+    }
+
     if (answers.some((answer) => answer === 0)) {
       router.push(
         `/questionario/#${answers.findIndex((answer) => answer === 0)}`
@@ -145,54 +161,82 @@ const QuestionarioPage = () => {
         </div>
 
         <div className="space-y-8 mt-[120px]">
-          <p className="mb-8">
-            Para cada pergunta, selecione um valor de 1 a 10 que melhor
-            representa o seu nível de domínio.
-          </p>
-
-          {questions.map((question, index) => (
-            <Card id={`${question.id}`} key={question.id} className="p-6">
-              <CardHeader className="">
-                <CardTitle className="text-lg">{question.title}</CardTitle>
-                <CardDescription className="text-base">
-                  {question.question}
-                </CardDescription>
-              </CardHeader>
+          <div className="space-y-8">
+            <Card className="p-6">
               <CardContent>
-                <div className="space-y-4">
-                  <p className="text-sm text-right text-muted-foreground">
-                    Sua resposta:{" "}
-                    {answers[index] === 0 ? "Nenhuma" : answers[index]}
-                  </p>
-                  <Slider
-                    value={[answers[index]]}
-                    onValueChange={(value) => handleAnswerChange(index, value)}
-                    max={max}
-                    min={min}
-                    step={step}
-                    className="w-full"
+                <div>
+                  <Label
+                    htmlFor="assessmentCompany"
+                    className="text-base font-semibold"
+                  >
+                    Empresa
+                  </Label>
+                  <Input
+                    required
+                    id="assessmentCompany"
+                    type="text"
+                    placeholder="Digite o nome da sua empresa"
+                    value={formData.empresa}
+                    onChange={(e) =>
+                      setFormData({ ...formData, empresa: e.target.value })
+                    }
+                    className="mt-2 border border-border"
                   />
-                  <div className="relative flex justify-between text-xs text-muted-foreground px-1 mt-2">
-                    {marks.map((mark) => (
-                      <span key={mark} className="w-[1px] text-center">
-                        {mark}
-                      </span>
-                    ))}
-                  </div>
                 </div>
               </CardContent>
             </Card>
-          ))}
 
-          <div className="text-center">
-            <Button
-              size="lg"
-              onClick={() => handleSubmit()}
-              className="w-full text-base max-w-[400px] md:w-auto px-8"
-            >
-              Ver Meus Resultados
-              <ArrowRight className="h-5 w-5" />
-            </Button>
+            <p className="mb-8">
+              Para cada pergunta, selecione um valor de 1 a 10 que melhor
+              representa o seu nível de domínio.
+            </p>
+
+            {questions.map((question, index) => (
+              <Card id={`${question.id}`} key={question.id} className="p-6">
+                <CardHeader className="">
+                  <CardTitle className="text-lg">{question.title}</CardTitle>
+                  <CardDescription className="text-base">
+                    {question.question}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-right text-muted-foreground">
+                      Sua resposta:{" "}
+                      {answers[index] === 0 ? "Nenhuma" : answers[index]}
+                    </p>
+                    <Slider
+                      value={[answers[index]]}
+                      onValueChange={(value) =>
+                        handleAnswerChange(index, value)
+                      }
+                      max={max}
+                      min={min}
+                      step={step}
+                      className="w-full"
+                    />
+                    <div className="relative flex justify-between text-xs text-muted-foreground px-1 mt-2">
+                      {marks.map((mark) => (
+                        <span key={mark} className="w-[1px] text-center">
+                          {mark}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            <div className="text-center">
+              <Button
+                size="lg"
+                onClick={() => handleSubmit()}
+                className="w-full text-base max-w-[400px] md:w-auto px-8"
+              >
+                Ver Meus Resultados
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
