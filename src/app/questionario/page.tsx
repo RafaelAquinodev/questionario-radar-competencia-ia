@@ -14,6 +14,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Question {
   id: number;
@@ -73,6 +74,12 @@ const questions: Question[] = [
 ];
 
 const QuestionarioPage = () => {
+  const min = 0;
+  const max = 10;
+  const step = 1;
+  const marks = Array.from({ length: max - min + 1 }, (_, i) => i + min);
+
+  const router = useRouter();
   const [answers, setAnswers] = useState<number[]>(new Array(8).fill(0));
   const progress =
     (answers.filter((answer) => answer !== 0).length / questions.length) * 100;
@@ -88,7 +95,17 @@ const QuestionarioPage = () => {
     resposta: answers[question.id - 1],
   }));
 
+  const totalScore = answers.reduce((acc, curr) => acc + curr, 0);
+
   const handleSubmit = async () => {
+    if (answers.some((answer) => answer === 0)) {
+      router.push(
+        `/questionario/#${answers.findIndex((answer) => answer === 0)}`
+      );
+      toast.error("Por favor, responda todas as perguntas.");
+      return;
+    }
+
     try {
       const response = await fetch("/api", {
         method: "POST",
@@ -102,6 +119,7 @@ const QuestionarioPage = () => {
 
       if (response.ok) {
         toast.success("Respostas enviadas com sucesso!");
+        router.push(`/feedback/${totalScore}`);
         setAnswers(new Array(8).fill(0));
       } else {
         toast.error("Erro ao enviar as respostas. Tente novamente.");
@@ -114,8 +132,8 @@ const QuestionarioPage = () => {
   return (
     <PageContainer className="items-start">
       <div className="max-w-3xl mx-auto">
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
+        <div className="mb-8 fixed top-0 left-0 right-0 bg-background/90 backdrop-blur-sm z-10 py-4 px-6 md:px-[8%] border-b border-border">
+          <div className="flex justify-between gap-4 items-center mb-4">
             <h1 className="text-2xl font-bold">
               Avaliação de Automação com IA
             </h1>
@@ -126,14 +144,14 @@ const QuestionarioPage = () => {
           <Progress value={progress} className="h-2" />
         </div>
 
-        <div className="space-y-8">
-          <p className="text-muted-foreground mb-8">
-            Para cada pergunta, selecione um valor de 0 a 10 que melhor
-            representa o estado atual da sua empresa.
+        <div className="space-y-8 mt-[120px]">
+          <p className="mb-8">
+            Para cada pergunta, selecione um valor de 1 a 10 que melhor
+            representa o seu nível de domínio.
           </p>
 
           {questions.map((question, index) => (
-            <Card key={question.id} className="p-6">
+            <Card id={`${question.id}`} key={question.id} className="p-6">
               <CardHeader className="">
                 <CardTitle className="text-lg">{question.title}</CardTitle>
                 <CardDescription className="text-base">
@@ -142,20 +160,25 @@ const QuestionarioPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-right text-muted-foreground">
                     Sua resposta:{" "}
                     {answers[index] === 0 ? "Nenhuma" : answers[index]}
                   </p>
                   <Slider
                     value={[answers[index]]}
-                    onValueChange={(value: any) =>
-                      handleAnswerChange(index, value)
-                    }
-                    max={10}
-                    min={0}
-                    step={1}
+                    onValueChange={(value) => handleAnswerChange(index, value)}
+                    max={max}
+                    min={min}
+                    step={step}
                     className="w-full"
                   />
+                  <div className="relative flex justify-between text-xs text-muted-foreground px-1 mt-2">
+                    {marks.map((mark) => (
+                      <span key={mark} className="w-[1px] text-center">
+                        {mark}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
