@@ -148,7 +148,9 @@ const QuestionarioPage = () => {
                   </p>
                   <Slider
                     value={[answers[index]]}
-                    onValueChange={(value) => handleAnswerChange(index, value)}
+                    onValueChange={(value: any) =>
+                      handleAnswerChange(index, value)
+                    }
                     max={10}
                     min={0}
                     step={1}
