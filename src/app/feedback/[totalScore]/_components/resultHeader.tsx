@@ -1,5 +1,5 @@
 interface ResultHeaderProps {
-  icon: any;
+  icon: React.ReactNode;
   totalScore: string;
   level: string;
 }
