@@ -9,6 +9,7 @@ export async function POST(req: Request) {
     const questionAnswer = await prisma.question.create({
       data: {
         answers: data.answers,
+        company: data.company,
       },
     });
     return NextResponse.json(questionAnswer, { status: 201 });

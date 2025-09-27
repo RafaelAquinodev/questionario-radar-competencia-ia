@@ -25,7 +25,7 @@ interface Question {
 }
 
 interface FormData {
-  empresa: string;
+  company: string;
 }
 
 const questions: Question[] = [
@@ -81,8 +81,9 @@ const questions: Question[] = [
 
 const QuestionarioPage = () => {
   const [formData, setFormData] = useState<FormData>({
-    empresa: "",
+    company: "",
   });
+  const [isSending, setIsSending] = useState(false);
 
   const min = 0;
   const max = 10;
@@ -108,9 +109,10 @@ const QuestionarioPage = () => {
   const totalScore = answers.reduce((acc, curr) => acc + curr, 0);
 
   const handleSubmit = async () => {
-    if (!formData.empresa) {
+    if (isSending) return;
+    if (!formData.company) {
       router.push(`/questionario/#0`);
-      toast.error("Por favor, responda todas as perguntas.");
+      toast.error("Por favor, insira o nome da empresa.");
       return;
     }
 
@@ -121,7 +123,7 @@ const QuestionarioPage = () => {
       toast.error("Por favor, responda todas as perguntas.");
       return;
     }
-
+    setIsSending(true);
     try {
       const response = await fetch("/api", {
         method: "POST",
@@ -130,6 +132,7 @@ const QuestionarioPage = () => {
         },
         body: JSON.stringify({
           answers: resposta,
+          company: formData.company,
         }),
       });
 
@@ -142,6 +145,8 @@ const QuestionarioPage = () => {
       }
     } catch (error) {
       console.error("Erro ao enviar as respostas:", error);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -176,9 +181,11 @@ const QuestionarioPage = () => {
                     id="assessmentCompany"
                     type="text"
                     placeholder="Digite o nome da sua empresa"
-                    value={formData.empresa}
+                    value={formData.company}
+                    maxLength={30}
+                    autoComplete="off"
                     onChange={(e) =>
-                      setFormData({ ...formData, empresa: e.target.value })
+                      setFormData({ ...formData, company: e.target.value })
                     }
                     className="mt-2 border border-border"
                   />
@@ -230,11 +237,18 @@ const QuestionarioPage = () => {
             <div className="text-center">
               <Button
                 size="lg"
-                onClick={() => handleSubmit()}
+                onClick={handleSubmit}
                 className="w-full text-base max-w-[400px] md:w-auto px-8"
+                disabled={isSending}
               >
-                Ver Meus Resultados
-                <ArrowRight className="h-5 w-5" />
+                {isSending ? (
+                  "Enviando..."
+                ) : (
+                  <>
+                    Ver Meus Resultados
+                    <ArrowRight className="h-5 w-5" />
+                  </>
+                )}
               </Button>
             </div>
           </div>
