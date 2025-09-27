@@ -16,5 +16,6 @@ datasource db {
 model Question {
   id        Int      @id @default(autoincrement())
   answers   Json
+  company String
   createdAt DateTime @default(now())
 }

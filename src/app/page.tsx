@@ -1,12 +1,11 @@
-import PageContainer from "./componentes/page-container";
+import PageContainer from "./_components/page-container";
 import { BarChart3, CheckCircle, Target } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import StartButton from "./componentes/start-button";
+import StartButton from "./_components/start-button";
 
 const Home = () => {
   return (
     <PageContainer className="bg-[url('/fundo2.svg')] bg-cover bg-bottom">
-      {/* // <PageContainer> */}
       <div className="flex flex-col items-center justify-center max-w-4xl mx-auto text-center gap-8">
         <div className="space-y-8">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6 text-balance">
